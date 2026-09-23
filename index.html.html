@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeepney Route Match</title>
+<style>
+:root{--ink:#172033;--muted:#667085;--line:#d9dee8;--panel:#f5f7fa;--good:#16835b;--bad:#c93636;--warn:#9a6800}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#eef1f5;color:var(--ink)}
+.wrap{max-width:900px;margin:0 auto;padding:32px 18px 50px}
+header{margin-bottom:22px}
+h1{font-size:clamp(32px,6vw,52px);margin:0;letter-spacing:-.04em}
+.subtitle{font-size:17px;color:var(--muted);line-height:1.55;max-width:720px;margin:9px 0 0}
+.card{background:white;border:1px solid var(--line);border-radius:22px;padding:22px;margin-bottom:16px;box-shadow:0 8px 25px rgba(20,30,50,.06)}
+.section-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted);margin-bottom:12px}
+.vehicle{overflow:hidden;padding:0}
+.vehicle-top{height:13px;background:var(--ink)}
+.vehicle-body{padding:22px}
+.jeep{display:grid;grid-template-columns:1fr 1.1fr 1fr;align-items:center;gap:18px}
+.sign{border:2px solid var(--ink);border-radius:13px;background:#fff;padding:15px 10px;text-align:center;font-weight:900}
+.sign small{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;letter-spacing:.06em}
+.side-sign{font-size:15px}.front-sign{font-size:21px}
+.vehicle-icon{text-align:center;font-size:76px}
+.caption{text-align:center;color:var(--muted);font-size:11px;margin-top:6px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;color:var(--muted);margin-bottom:8px}
+select{width:100%;height:52px;border:1px solid var(--line);border-radius:13px;background:white;padding:0 14px;font-size:16px;font-weight:700;color:var(--ink)}
+.actions{display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin-top:15px}
+button{height:52px;border:0;border-radius:13px;background:var(--ink);color:#fff;font-size:15px;font-weight:850;cursor:pointer}
+button.secondary{background:white;color:var(--ink);border:1px solid var(--line)}
+button:hover{filter:brightness(1.08)}
+.result{border-radius:18px;padding:20px;margin-top:16px;border:1px solid var(--line);background:#f8fafc}
+.result.good{background:#effaf5;border-color:#9ad7bd}.result.bad{background:#fff3f3;border-color:#edaaaa}.result.warn{background:#fff9eb;border-color:#e4c77b}
+.result h2{margin:0 0 7px;font-size:23px}.result p{margin:0;color:#475467;line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;color:#475467}
+.explain{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.explain div{background:var(--panel);padding:16px;border-radius:15px}.explain strong{display:block;margin-bottom:5px}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px;line-height:1.5}
+@media(max-width:650px){.jeep,.controls,.actions,.explain{grid-template-columns:1fr}.vehicle-icon{order:-1}.wrap{padding-top:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Jeepney Route Match</h1>
+<p class="subtitle">A pre-boarding verification prototype designed to help passengers check whether a jeepney's current destination matches where they intend to go.</p>
+</header>
+
+<div class="card vehicle">
+<div class="vehicle-top"></div>
+<div class="vehicle-body">
+<div class="jeep">
+<div>
+<div class="sign side-sign"><small>PERMANENT SIDE MARKING</small>LRT SUCAT ↔ SUCAT / ALABANG</div>
+<div class="caption">Fixed route information</div>
+</div>
+<div class="vehicle-icon">🚐</div>
+<div>
+<div class="sign front-sign"><small>CURRENT FRONT DESTINATION</small><span id="frontDisplay">ALABANG</span></div>
+<div class="caption">Active trip information</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="section-title">Passenger verification</div>
+<div class="controls">
+<div>
+<label for="front">Current front destination</label>
+<select id="front">
+<option>Alabang</option><option>Las Piñas</option><option>Sucat</option>
+</select>
+</div>
+<div>
+<label for="passenger">My intended destination</label>
+<select id="passenger">
+<option>Alabang</option><option>Las Piñas</option><option>Sucat</option>
+</select>
+</div>
+</div>
+<div class="actions">
+<button id="check">CHECK BEFORE BOARDING</button>
+<button id="demo" class="secondary">LOAD CONFLICT DEMO</button>
+</div>
+<div id="result" class="result">
+<h2>Ready to check</h2>
+<p>Select the current front destination and your intended destination, then check before boarding.</p>
+</div>
+</div>
+
+<div class="card">
+<div class="section-title">How the prototype works</div>
+<div class="explain">
+<div><strong>1. Fixed information</strong>The permanent side marking is displayed separately because it may not represent the vehicle's active trip at a particular moment.</div>
+<div><strong>2. Active information</strong>The current front destination represents the trip the passenger is about to board.</div>
+<div><strong>3. Passenger intent</strong>The passenger selects the destination they actually need to reach.</div>
+<div><strong>4. Verification</strong>The system compares the active destination with the passenger's intended destination and flags a mismatch or signage conflict.</div>
+</div>
+</div>
+
+<footer>
+Software simulation prototype • Demonstration values are simulated for the prototype scenario.<br>
+Designed as a student prototype for Science, Technology, and Society.
+</footer>
+</div>
+
+<script>
+const front=document.getElementById('front');
+const passenger=document.getElementById('passenger');
+const display=document.getElementById('frontDisplay');
+const result=document.getElementById('result');
+
+function updateDisplay(){display.textContent=front.value.toUpperCase();}
+
+function checkRoute(){
+ const f=front.value.toLowerCase(), p=passenger.value.toLowerCase();
+ if(f===p){
+   result.className='result good';
+   result.innerHTML='<h2>🟢 ROUTE MATCH</h2><p>The jeepney’s current front destination matches your intended destination. The passenger can proceed with greater confidence before boarding.</p><div class="pills"><span class="pill">Current trip: '+front.value+'</span><span class="pill">Passenger: '+passenger.value+'</span></div>';
+ }else if(f==='las piñas' && (p==='alabang'||p==='sucat')){
+   result.className='result warn';
+   result.innerHTML='<h2>⚠️ SIGNAGE CONFLICT DETECTED</h2><p>The permanent side marking contains information associated with the passenger’s intended direction, but the current front destination is Las Piñas. The signals conflict, so the passenger should confirm the active trip before boarding.</p><div class="pills"><span class="pill">Side: Sucat / Alabang</span><span class="pill">Front: '+front.value+'</span><span class="pill">Passenger: '+passenger.value+'</span></div>';
+ }else{
+   result.className='result bad';
+   result.innerHTML='<h2>🔴 ROUTE MISMATCH</h2><p>The jeepney’s current destination does not match the passenger’s intended destination. The passenger should not rely on the fixed side marking alone and should confirm the route before boarding.</p><div class="pills"><span class="pill">Current trip: '+front.value+'</span><span class="pill">Passenger: '+passenger.value+'</span></div>';
+ }
+}
+
+front.addEventListener('change',updateDisplay);
+document.getElementById('check').addEventListener('click',checkRoute);
+document.getElementById('demo').addEventListener('click',()=>{
+ front.value='Las Piñas'; passenger.value='Alabang'; updateDisplay(); checkRoute();
+});
+updateDisplay();
+</script>
+</body>
+</html>
